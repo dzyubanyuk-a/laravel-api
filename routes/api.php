@@ -1,7 +1,10 @@
 <?php
 
 use App\Http\Controllers\Auth\UserAuthController;
+use App\Http\Requests\EmailUserRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,3 +20,12 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/register', [UserAuthController::class, 'register']);
 Route::post('/auth/login', [UserAuthController::class, 'login']);
+
+Route::post('/auth/restore', [UserAuthController::class, 'restore'])->middleware('guest');
+
+Route::get('/auth/restore/confirm/', [UserAuthController::class, 'confirm'])->middleware('guest')->name('password.reset');
+
+
+
+
+

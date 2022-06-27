@@ -2,12 +2,13 @@
 
 namespace App\Repositories;
 
+use App\Http\Requests\EmailUserRequest;
+use App\Http\Requests\LoginUserRequest;
 use App\Http\Requests\RegisterUserRequest;
 use App\Models\User;
 use App\Repositories\Interfaces\UserRepositoryInterface;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
+
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -27,8 +28,9 @@ class UserRepository implements UserRepositoryInterface
         return $user;
     }
 
-    public function login(): Authenticatable
+    public function login(LoginUserRequest $request)
     {
         return Auth::user();
     }
+
 }
