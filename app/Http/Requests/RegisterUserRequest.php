@@ -24,13 +24,13 @@ class RegisterUserRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'=>'required',
-            'email'=>'required|unique:users',
-            'type'=>'required',
-            'github'=>'required',
-            'city'=>'required',
-            'phone'=>'required',
-            'birthday'=>'required',
+            'name'=>'bail|required|alpha|string|min:2',
+            'email'=>'bail|required|unique:users|string',
+            'type'=>'bail|required|string',
+            'github'=>'bail|required|url|string',
+            'city'=>'bail|required|string',
+            'phone'=>'bail|required|digits:11',
+            'birthday'=>'bail|required|date|string',
         ];
     }
 }
