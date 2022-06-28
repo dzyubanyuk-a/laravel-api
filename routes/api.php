@@ -19,11 +19,21 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('/auth/register', [UserAuthController::class, 'register']);
+
 Route::post('/auth/login', [UserAuthController::class, 'login']);
 
-Route::post('/auth/restore', [UserAuthController::class, 'restore'])->middleware('guest');
 
-Route::get('/auth/restore/confirm/', [UserAuthController::class, 'confirm'])->middleware('guest')->name('password.reset');
+
+Route::post('/auth/restore', [UserAuthController::class, 'restore'])
+    ->middleware('guest');
+
+Route::post('/auth/restore/confirm', [UserAuthController::class, 'confirm'])->middleware('guest')->name('password.reset');
+
+
+/*Route::post('/auth/restore/confirm/{token}', [UserAuthController::class, 'confirm'])
+    ->middleware('guest')
+
+->name('password.reset');*/
 
 
 

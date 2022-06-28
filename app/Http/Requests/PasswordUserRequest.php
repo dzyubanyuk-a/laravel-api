@@ -24,9 +24,9 @@ class PasswordUserRequest extends FormRequest
     public function rules()
     {
         return [
-            'token' => 'min:1',
-            'password' => 'min:6',
-            'password_confirmation' => 'min:6',
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|min:6|confirmed',
         ];
     }
 }

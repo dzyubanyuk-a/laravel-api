@@ -4,9 +4,12 @@ namespace App\Services\Users;
 
 use App\Http\Requests\EmailUserRequest;
 use App\Http\Requests\LoginUserRequest;
+use App\Http\Requests\PasswordUserRequest;
 use App\Repositories\UserRepository;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 
@@ -40,6 +43,41 @@ class UserGetService
         $token = $this->UserRepository->login($request)->createToken('API Token')->accessToken;
 
         return (['token'=>$token, 'user'=>auth()->user(), 'password'=>$request->password]);
+    }
+
+    public function restore(EmailUserRequest $request)
+    {
+
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+
+        return $status === Password::RESET_LINK_SENT
+            ? 'Письмо успешно отправлено'
+            : 'Ошибка при отправке письма';
+
+    }
+
+    public function confirm(PasswordUserRequest $request)
+    {
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password)
+                ])->setRememberToken(Str::random(60));
+
+                $user->save();
+
+                event(new PasswordReset($user));
+            });
+
+
+
+        return $status === Password::PASSWORD_RESET
+            ? 'Пароль успешно обновлен'
+            : 'Ошибка при сбросе пароля';
     }
 
 
