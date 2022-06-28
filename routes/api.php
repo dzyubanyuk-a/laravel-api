@@ -22,7 +22,7 @@ Route::post('/auth/register', [UserAuthController::class, 'register']);
 Route::post('/auth/login', [UserAuthController::class, 'login']);
 
 //Список отделений с работниками
-Route::post('/departments', [DepartmentController::class, 'departments'])
+Route::get('/departments', [DepartmentController::class, 'departments'])
     ->middleware('auth:api');
 
 //Письмо для сброса пароля
