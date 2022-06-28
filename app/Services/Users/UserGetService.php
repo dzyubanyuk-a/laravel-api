@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 
+
 class UserGetService
 {
 
@@ -23,6 +24,7 @@ class UserGetService
         $this->UserRepository = $UserRepository;
     }
 
+    //Логика регистрации пользователя
     public function register($request): array
     {
         $password = Str::random(6);
@@ -34,6 +36,7 @@ class UserGetService
         return (['user'=>$user, 'token'=>$token, 'password'=>$password]);
     }
 
+    //Логика авторизации пользователя
     public function login(LoginUserRequest $request):Response|array
     {
         if (!Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
@@ -45,6 +48,7 @@ class UserGetService
         return (['token'=>$token, 'user'=>auth()->user(), 'password'=>$request->password]);
     }
 
+    //Логика  отправки письма для сброса пароля
     public function restore(EmailUserRequest $request)
     {
 
@@ -58,6 +62,7 @@ class UserGetService
 
     }
 
+    //Логика сброса пароля
     public function confirm(PasswordUserRequest $request)
     {
 
@@ -73,12 +78,9 @@ class UserGetService
                 event(new PasswordReset($user));
             });
 
-
-
         return $status === Password::PASSWORD_RESET
             ? 'Пароль успешно обновлен'
             : 'Ошибка при сбросе пароля';
     }
-
 
 }

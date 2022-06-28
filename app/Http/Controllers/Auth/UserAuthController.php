@@ -38,7 +38,7 @@ class UserAuthController extends Controller
     }
 
     //Ссылка на сброс пароля (пишу в лог)
-    public function restore(EmailUserRequest $request)
+    public function restore(EmailUserRequest $request): string
     {
 
        return $this->UserGetService->restore($request);
@@ -46,7 +46,7 @@ class UserAuthController extends Controller
     }
 
     //Сброс пароля
-    public function confirm(PasswordUserRequest $request)
+    public function confirm(PasswordUserRequest $request): string
     {
         return $this->UserGetService->confirm($request);
     }

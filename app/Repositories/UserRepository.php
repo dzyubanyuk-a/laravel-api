@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 
 class UserRepository implements UserRepositoryInterface
 {
+    //Создание пользователя
     public function register(RegisterUserRequest $request, $password)
     {
         $user = new User;
@@ -28,6 +29,7 @@ class UserRepository implements UserRepositoryInterface
         return $user;
     }
 
+    //Авторизация пользователя
     public function login(LoginUserRequest $request)
     {
         return Auth::user();
