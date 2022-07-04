@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Domain\Enums\Roles\Roles;
 use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
@@ -23,9 +24,16 @@ class Role
             return response()->json('Не авторизован!');
         }
 
-        foreach ($roles as $role) {
 
-            if (Auth::user()->role == array_search($role, $this->roles())) {
+        $arrRoles = [];
+
+        foreach ( Roles::cases() as $case ) {
+            $arrRoles[$case->value] = $case->name;
+        }
+
+        foreach ($roles as $role)
+        {
+            if(Auth::user()->role == array_search($role, $arrRoles)){
                 return $next($request);
             }
         }

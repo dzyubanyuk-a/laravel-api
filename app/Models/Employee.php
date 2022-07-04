@@ -5,29 +5,25 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class Worker extends Model
+class Employee extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'name'
-    ];
-
-    protected $hidden = [
-        'created_at',
-        'updated_at',
-        'department_id'
-    ];
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class);
     }
 
-    public function employee(): hasOne
+    public function worker(): belongsTo
     {
-        return $this->hasOne(Employee::class);
+        return $this->belongsTo(Worker::class);
     }
 }
