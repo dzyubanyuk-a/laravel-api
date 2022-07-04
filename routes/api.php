@@ -40,19 +40,18 @@ Route::controller(UserAuthController::class)->prefix('auth')->group(function () 
 
 //Список сотрудников
 Route::get('/departments', [DepartmentController::class, 'departments'])
-    ->middleware('auth:api');
-
-
+    ->middleware(['auth:api', 'user.role:user,admin,employee']);
 
 //Пользователь
 Route::get('/user/{id}', [UserAuthController::class, 'show'])
-    ->middleware('auth:api');
+    ->middleware(['auth:api', 'user.role:admin,employee']);
 
 //Обновление данных пользователя
 Route::post('/user', [UserAuthController::class, 'update'])
-    ->middleware('auth:api');
+    ->middleware(['auth:api', 'user.role:admin']);
 
 
 //Сотрудники
 Route::get('/workers', [WorkerController::class, 'workers'])
-    ->middleware('auth:api');
+    ->middleware(['auth:api', 'user.role:admin,employee']);
+
