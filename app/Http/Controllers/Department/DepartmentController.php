@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\Department;
 
 use App\Http\Controllers\Controller;
-use App\Models\Department;
+use App\Http\Resources\DepartmentResource;
 use App\Repositories\DepartmentRepository;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Illuminate\Http\JsonResponse;
 
 class DepartmentController extends Controller
 {
@@ -19,8 +18,11 @@ class DepartmentController extends Controller
     }
 
     //Вывод списка отделов с сотрудниками
-    public function departments(): Response
+    public function departments(): JsonResponse
     {
-        return response($this->DepartmentRepository->departments());
+
+        $department = DepartmentResource::collection($this->DepartmentRepository->departments());
+
+        return response()->json($department);
     }
 }

@@ -8,8 +8,8 @@ use App\Repositories\Interfaces\DepartmentRepositoryInterface;
 class DepartmentRepository implements DepartmentRepositoryInterface
 {
     //Список отделений с сотрудниками
-    public function departments()
+    public function departments(): \Illuminate\Database\Eloquent\Collection
     {
-        return Department::query()->with('worker')->get();
+        return Department::all();
     }
 }

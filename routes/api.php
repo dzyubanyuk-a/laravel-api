@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\UserAuthController;
 use App\Http\Controllers\Department\DepartmentController;
+use App\Http\Controllers\Worker\WorkerController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,21 +16,43 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-//Регистрация пользователя
-Route::post('/auth/register', [UserAuthController::class, 'register']);
+Route::controller(UserAuthController::class)->prefix('auth')->group(function () {
 
-//Аутентификация пользователя
-Route::post('/auth/login', [UserAuthController::class, 'login']);
+    //Регистрация пользователя
+    Route::post('/register', 'register')
+        ->name('register');
 
-//Список отделений с работниками
+    //Аутентификация пользователя
+    Route::post('/login', 'login')
+        ->name('login');;
+
+    //Письмо для сброса пароля
+    Route::post('/restore', 'restore')
+        ->middleware('guest')
+        ->name('password.restore');;
+
+    //Сброс пароля
+    Route::post('/restore/confirm','confirm')
+        ->middleware('guest')
+        ->name('password.reset');
+
+});
+
+//Список сотрудников
 Route::get('/departments', [DepartmentController::class, 'departments'])
     ->middleware('auth:api');
 
-//Письмо для сброса пароля
-Route::post('/auth/restore', [UserAuthController::class, 'restore'])
-    ->middleware('guest');
 
-//Сброс пароля
-Route::post('/auth/restore/confirm', [UserAuthController::class, 'confirm'])
-    ->middleware('guest')
-    ->name('password.reset');
+
+//Пользователь
+Route::get('/user/{id}', [UserAuthController::class, 'show'])
+    ->middleware('auth:api');
+
+//Обновление данных пользователя
+Route::post('/user', [UserAuthController::class, 'update'])
+    ->middleware('auth:api');
+
+
+//Сотрудники
+Route::get('/workers', [WorkerController::class, 'workers'])
+    ->middleware('auth:api');

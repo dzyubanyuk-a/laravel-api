@@ -3,11 +3,18 @@
 namespace App\Services\Users;
 
 use App\Http\Requests\EmailUserRequest;
+use App\Http\Requests\IdUserRequest;
 use App\Http\Requests\LoginUserRequest;
 use App\Http\Requests\PasswordUserRequest;
+use App\Http\Requests\RegisterUserRequest;
+use App\Http\Resources\LoginResource;
+use App\Http\Resources\RegisterResource;
+use App\Http\Resources\UserResource;
+use App\Models\User;
 use App\Repositories\UserRepository;
 use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Http\Response;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
@@ -21,39 +28,60 @@ class UserGetService
 
     public function __construct(UserRepository $UserRepository)
     {
+
         $this->UserRepository = $UserRepository;
+
     }
 
     //Логика регистрации пользователя
-    public function register($request): array
+    public function register(RegisterUserRequest $request): JsonResponse
     {
         $password = Str::random(6);
 
         $user = $this->UserRepository->register($request, $password);
-        $user = Auth::loginUsingId($user->id, true);
-        $token = $user->createToken('API Token')->accessToken;
 
-        return (['user'=>$user, 'token'=>$token, 'password'=>$password]);
+        if($user) {
+
+            $user = new RegisterResource(User::find($user->id));
+
+            $success['token'] = $user->createToken('API Token')->accessToken;
+
+            return response()->json(['token' => $success['token'], 'user' => $user, 'password' => $password]);
+
+        }else{
+
+            return response()->json(['error' => 'Ошибка!'], 401);
+
+        }
     }
 
-    //Логика авторизации пользователя
-    public function login(LoginUserRequest $request):Response|array
+    //Логика аутентификации пользователя
+    public function login(LoginUserRequest $request):JsonResponse
     {
-        if (!Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            return response(['error' => 'Ошибка!']);
+        if (Auth::attempt(['email' => request('email'), 'password' => request('password')])) {
+
+            $user = new LoginResource($this->UserRepository->login($request));
+
+            $success['token'] = $user->createToken('API Token')->accessToken;
+
+            return response()->json(['token' => $success['token'], 'user' => $user, 'password' => $request->password], 200);
+
+        } else {
+
+            return response()->json(['error' => 'Ошибка!'], 401);
+
         }
 
-        $token = $this->UserRepository->login($request)->createToken('API Token')->accessToken;
-
-        return (['token'=>$token, 'user'=>auth()->user(), 'password'=>$request->password]);
     }
 
     //Логика  отправки письма для сброса пароля
-    public function restore(EmailUserRequest $request)
+    public function restore(EmailUserRequest $request): string
     {
 
         $status = Password::sendResetLink(
+
             $request->only('email')
+
         );
 
         return $status === Password::RESET_LINK_SENT
@@ -63,10 +91,11 @@ class UserGetService
     }
 
     //Логика сброса пароля
-    public function confirm(PasswordUserRequest $request)
+    public function confirm(PasswordUserRequest $request): string
     {
 
         $status = Password::reset(
+
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function ($user, $password) {
                 $user->forceFill([
@@ -81,6 +110,25 @@ class UserGetService
         return $status === Password::PASSWORD_RESET
             ? 'Пароль успешно обновлен'
             : 'Ошибка при сбросе пароля';
+    }
+
+    public function show(IdUserRequest $request)
+    {
+
+          return new UserResource($this->UserRepository->show($request));
+
+    }
+
+    public function update($request):JsonResponse
+    {
+        $user = User::findOrFail($request->id);
+        $user->update($request->all());
+
+
+
+
+            return response()->json(['message' => 'Good!'], 200);
+
     }
 
 }
